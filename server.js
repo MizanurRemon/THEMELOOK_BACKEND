@@ -131,4 +131,86 @@ app.get("/", function (req, res) {
   res.json("Themelooks Task");
 });
 
+app.post("/customer_registration", function (req, res) {
+  let sqlQuery =
+    "INSERT INTO `customers`(`customer_name`, `phone`, `password`) VALUES (?, ?, ?)";
+
+  con.query(
+    sqlQuery,
+    [req.body.customer_name, req.body.phone, req.body.password],
+    function (err, row) {
+      if (err) {
+        res.json(err);
+      } else {
+        var data = "registered";
+        const value = {
+          message: data,
+        };
+
+        res.json(value);
+      }
+    }
+  );
+});
+
+app.get("/validation", function (req, res) {
+  let sqlQuery = "SELECT `customerID` FROM `customers` WHERE phone = ?";
+
+  con.query(sqlQuery, [req.query.phone], function (err, row) {
+    if (err) {
+      res.json(err);
+    } else {
+      var data = JSON.parse(JSON.stringify(row[0]) || null);
+      if (data == null) {
+        data = "-1";
+        const value = {
+          customerID: data,
+        };
+        res.json(value);
+      } else {
+        res.json(data);
+      }
+    }
+  });
+});
+
+app.get("/customer_login", function (req, res) {
+  let sqlQuery =
+    "SELECT `customerID` FROM `customers` where phone = ? and password = ?";
+
+  con.query(
+    sqlQuery,
+    [req.query.phone, req.query.password],
+    function (err, rows) {
+      if (err) {
+        res.json("something error");
+      } else {
+        var data = JSON.parse(JSON.stringify(rows[0]) || null);
+        if (data == null) {
+          data = "-1";
+          const value = {
+            customerID: data,
+          };
+          res.json(value);
+        } else {
+          res.json(data);
+        }
+      }
+    }
+  );
+});
+
+app.get("/profile", function (req, res) {
+  let sqlQuery = "SELECT `customer_name` FROM `customers` WHERE customerID = ?";
+
+  con.query(sqlQuery, [req.query.customerID], function (err, row) {
+    if (err) {
+      res.json(err);
+    } else {
+      var data = JSON.parse(JSON.stringify(row[0]) || null);
+      res.json(data);
+    }
+  });
+});
+
 app.listen(port);
